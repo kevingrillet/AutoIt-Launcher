@@ -7,13 +7,11 @@
 	Small launcher.
 
  ToDo:
-	Add 2 missing UI [./forms]
+	Add missing UI [./forms/fButtonSettings]
 	Right click on button in [bButtonClick]
-	Remove all buttons before refresh [__RemoveAllButtons()]
-	Save/Load buttons [__LoadButtons / __SaveButtons]
-		https://www.autoitscript.com/autoit3/docs/libfunctions/_FileWriteFromArray.htm
-		https://www.autoitscript.com/autoit3/docs/libfunctions/_FileReadToArray.htm
+	Add button / data
 		https://www.autoitscript.com/autoit3/docs/libfunctions/_ArrayInsert.htm
+	Edit Button
 
 	Change order of buttons?
 	Test if it's working
@@ -67,10 +65,11 @@ Const $CST_SCRIPT = 2
 #EndRegion ### CONSTANTS ###
 
 #Region ### VARIABLES ###
+Local $aListButton[0][0]
+Local $aDataButton[0][0]
+Local $sPathButtons = @ScriptDir & "\AutoIt_Launcher_buttons.txt"
 Local $sPathIni = @ScriptDir & "\AutoIt_Launcher.ini"
 Local $sPathLog = @ScriptDir & "\AutoIt_Launcher.log"
-Local $aListButton[][]
-Local $aDataButton[][]
 #EndRegion ### VARIABLES ###
 
 #Region ### OPT ###
@@ -81,7 +80,7 @@ Opt("TrayOnEventMode", 1) ;0=disable, 1=enable
 #EndRegion ### OPT ###
 
 #Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fglobalsettings.kxf
-$fGlobalSettings = GUICreate("Global Settings", 158, 157, 192, 147, $WS_SYSMENU)
+$fGlobalSettings = GUICreate("Global Settings", 158, 157, -1, -1, $WS_SYSMENU)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fGlobalSettingsClose")
 $lCols = GUICtrlCreateLabel("Columns", 8, 43, 44, 17)
 $lRow = GUICtrlCreateLabel("Row", 8, 11, 26, 17)
@@ -90,8 +89,14 @@ $iCol = GUICtrlCreateInput("1", 56, 40, 89, 21, BitOR($GUI_SS_DEFAULT_INPUT, $ES
 $bSaveSettings = GUICtrlCreateButton("Save Global Settings", 8, 96, 139, 25)
 GUICtrlSetOnEvent($bSaveSettings, "bSaveSettingsClick")
 $cbLog = GUICtrlCreateCheckbox("Save log", 8, 72, 97, 17)
+#EndRegion ### END Koda GUI section ###
+
+#Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fautoitlauncher.kxf
+$fAutoItLauncher = GUICreate("AutoIt Launcher", 615, 437, -1, -1, $WS_SYSMENU)
+GUISetOnEvent($GUI_EVENT_CLOSE, "fAutoItLauncherClose")
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
+
 
 #Region ### TrayIcon ###
 $miShow = TrayCreateItem("Show AutoIt Launcher")
@@ -107,7 +112,7 @@ TraySetToolTip("AutoIt Launcher")
 __Log("Starting")
 __LoadIni()
 If Not FileExists($sPathIni) Then
-	__ShowGlobalSettings
+	__ShowGlobalSettings()
 EndIf
 __LoadButtons()
 
@@ -121,40 +126,66 @@ Func __Exit()
 	Exit
 EndFunc   ;==>__Exit
 Func __LoadButtons()
-	__RemoveAllButtons()
-	Local $buttonID = 0
-	For $y = 0 To GUICtrlRead($iRow) Step -1
-		For $x = 0 To GUICtrlRead($iCol) Step -1
-			$buttonID = $y * GUICtrlRead($iCol) + $x
-			$aListButton[$y][$x] = GUICtrlCreateButton("Button_" & $y & "_" & $x, 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP)
-			GUICtrlSetOnEvent(-1, "bButtonClick")
-			If $buttonID <= UBound($aDataButton, 1) Then
-				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
-				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])
-			EndIf
-		Next
-	Next
+	_FileReadToArray($sPathButtons, $aDataButton)
+	__RefreshButtons()
 EndFunc   ;==>__LoadButtons
 Func __LoadIni()
 	__Log("LoadIni")
 	GUICtrlSetData($iCol, IniRead($sPathIni, "AutoIt_Launcher_Global_Settings", "iCol", 1))
 	GUICtrlSetData($iRow, IniRead($sPathIni, "AutoIt_Launcher_Global_Settings", "iRow", 1))
 	GUICtrlSetState($cbLog, IniRead($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", $GUI_UNCHECKED))
-
 EndFunc   ;==>__LoadIni
 Func __Log($sToLog)
 	If GUICtrlRead($cbLog) = $GUI_CHECKED Then
 		_FileWriteLog($sPathLog, $sToLog & @CRLF)
 	EndIf
 EndFunc   ;==>__Log
+Func __RefreshButtons()
+	__Resize()
+	__RemoveAllButtons()
+	Local $buttonID = 0
+	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+			$buttonID = $y * GUICtrlRead($iCol) + $x
+			If $y >= UBound($aListButton, 1) Or $x >= UBound($aListButton, 2) Then
+				_ArrayInsert($aListButton, $y & ";" & $x, GUICtrlCreateButton("Button_" & $y & "_" & $x, 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP))
+			Else
+				$aListButton[$y][$x] = GUICtrlCreateButton("Button_" & $y & "_" & $x, 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP)
+			EndIf
+			GUICtrlSetOnEvent(-1, "bButtonClick")
+			If $buttonID < UBound($aDataButton, 1) Then
+				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
+				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])
+			EndIf
+		Next
+	Next
+EndFunc   ;==>__RefreshButtons
 Func __RemoveAllButtons()
-EndFunc
+	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+		If $y < UBound($aDataButton, 1) Then
+			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+				If $x < UBound($aDataButton, 2) Then
+					GUICtrlDelete($aListButton[$y][$x])
+				EndIf
+			Next
+		EndIf
+	Next
+EndFunc   ;==>__RemoveAllButtons
+Func __Resize()
+	Local $width = 16 + (48 + 4) * GUICtrlRead($iCol)
+	Local $x = (@DesktopWidth / 2) - ($width / 2)
+	Local $height = 16 + (48 + 4) * GUICtrlRead($iRow)
+	Local $y = (@DesktopHeight / 2) - ($height / 2)
+	Return WinMove($fAutoItLauncher, "AutoIt Launcher", $x, $y, $width, $height)
+EndFunc   ;==>__Resize
 ;~ https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=943199
 Func __RunAU3($sFilePath, $sWorkingDir = "", $iShowFlag = @SW_SHOW, $iOptFlag = 0)
 	Return Run('"' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
 EndFunc   ;==>__RunAU3
 Func __SaveButtons()
-EndFunc
+	_FileWriteFromArray($sPathButtons, $aDataButton)
+	__RefreshButtons()
+EndFunc   ;==>__SaveButtons
 Func __SaveIni()
 	__Log("SaveIni")
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "iCol", GUICtrlRead($iCol))
@@ -162,7 +193,7 @@ Func __SaveIni()
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", GUICtrlRead($cbLog))
 EndFunc   ;==>__SaveIni
 Func __Show()
-	;GUISetState(@SW_SHOW, $whLauncher)
+	GUISetState(@SW_SHOW, $fAutoItLauncher)
 EndFunc   ;==>__Show
 Func __ShowGlobalSettings()
 	GUISetState(@SW_SHOW, $fGlobalSettings)
@@ -173,8 +204,8 @@ Func bSaveSettingsClick()
 EndFunc   ;==>bSaveSettingsClick
 Func bButtonClick()
 	Local $buttonID = 0
-	For $y = 0 To GUICtrlRead($iRow) Step -1
-		For $x = 0 To GUICtrlRead($iCol) Step -1
+	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
 			If $aListButton[$y][$x] = @GUI_CtrlId Then
 				$buttonID = $y * GUICtrlRead($iCol) + $x
 				Switch $aDataButton[$buttonID][$CST_MODE]
@@ -190,6 +221,9 @@ Func bButtonClick()
 		Next
 	Next
 EndFunc   ;==>bButtonClick
+Func fAutoItLauncherClose()
+	GUISetState(@SW_HIDE, $fAutoItLauncher)
+EndFunc   ;==>fAutoItLauncherClose
 Func fGlobalSettingsClose()
 	GUISetState(@SW_HIDE, $fGlobalSettings)
 EndFunc   ;==>fGlobalSettingsClose

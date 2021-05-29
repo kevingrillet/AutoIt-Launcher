@@ -2,8 +2,9 @@
 BackUp
 Build
 Koda
-AutoIt-Launcher.ini
-AutoIt-Launcher.log
+AutoIt_Launcher.ini
+AutoIt_Launcher.log
+AutoIt_Launcher_buttons.txt
 
 # https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
 .vscode/*

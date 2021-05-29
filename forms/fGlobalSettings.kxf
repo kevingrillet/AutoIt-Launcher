@@ -4,7 +4,7 @@
 		<property name="Left" vt="Int16">192</property>
 		<property name="Top" vt="Int8">124</property>
 		<property name="Width" vt="Int16">173</property>
-		<property name="Height" vt="Int16">170</property>
+		<property name="Height" vt="Int16">195</property>
 		<property name="Caption" vt="String">Global Settings</property>
 		<property name="Color" vt="Ident">clBtnFace</property>
 		<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
@@ -17,10 +17,10 @@
 		<property name="Style" vt="Int32">340262912</property>
 		<property name="ExStyle" vt="Int16">256</property>
 		<property name="Version" vt="String">1.04</property>
-		<property name="FormOptOnEvent" vt="False">False</property>
-		<property name="FormOptExpVars" vt="False">False</property>
-		<property name="FormOptPopulate" vt="False">False</property>
-		<property name="FormOptVarsForSet" vt="False">False</property>
+		<property name="FormOptOnEvent" vt="True">True</property>
+		<property name="FormOptExpVars" vt="True">True</property>
+		<property name="FormOptPopulate" vt="True">True</property>
+		<property name="FormOptVarsForSet" vt="True">True</property>
 		<property name="FormOptIndentChar" vt="Int8">0</property>
 		<property name="FormOptIndentCount" vt="Int8">1</property>
 		<property name="FormOptIndentInit" vt="Int8">0</property>
@@ -91,7 +91,7 @@
 		<object type="TAButton" name="bSaveSettings">
 			<properties>
 				<property name="Left" vt="Int8">8</property>
-				<property name="Top" vt="Int8">72</property>
+				<property name="Top" vt="Int8">96</property>
 				<property name="Width" vt="Int16">139</property>
 				<property name="Height" vt="Int8">25</property>
 				<property name="Caption" vt="String">Save Global Settings</property>
@@ -100,6 +100,20 @@
 				<property name="CtrlStyle" vt="Int32">1342373888</property>
 				<property name="CtrlExStyle" vt="Int8">0</property>
 				<property name="Resizing" vt="Set">DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TACheckbox" name="cbLog">
+			<properties>
+				<property name="Left" vt="Int8">8</property>
+				<property name="Top" vt="Int8">72</property>
+				<property name="Width" vt="Int8">97</property>
+				<property name="Height" vt="Int8">17</property>
+				<property name="Caption" vt="String">Save log</property>
+				<property name="TabOrder" vt="Int8">5</property>
+				<property name="CtrlStyle" vt="Int32">1342242819</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockHeight</property>
 			</properties>
 			<components/>
 		</object>

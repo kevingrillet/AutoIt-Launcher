@@ -9,9 +9,15 @@
  ToDo:
 	Add missing UI [./forms/fButtonSettings]
 	Right click on button in [bButtonClick]
+		https://www.autoitscript.com/forum/topic/74079-check-for-right-click/?do=findComment&comment=1277537
 	Add button / data
 		https://www.autoitscript.com/autoit3/docs/libfunctions/_ArrayInsert.htm
+	Onclick
+		If no action linked, open buttonSettings
 	Edit Button
+		Get button ID then let's edit it
+		Reload after save
+		Save in file
 
 	Change order of buttons?
 	Test if it's working

@@ -20,7 +20,7 @@
 		<property name="FormOptOnEvent" vt="True">True</property>
 		<property name="FormOptExpVars" vt="True">True</property>
 		<property name="FormOptPopulate" vt="True">True</property>
-		<property name="FormOptVarsForSet" vt="True">True</property>
+		<property name="FormOptVarsForSet" vt="False">False</property>
 		<property name="FormOptIndentChar" vt="Int8">0</property>
 		<property name="FormOptIndentCount" vt="Int8">1</property>
 		<property name="FormOptIndentInit" vt="Int8">0</property>

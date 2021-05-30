@@ -201,14 +201,10 @@ Func __RefreshButtons()
 	Next
 EndFunc   ;==>__RefreshButtons
 Func __RemoveAllButtons()
-	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-		If $y < UBound($aDataButton, 1) Then
-			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-				If $x < UBound($aDataButton, 2) Then
-					GUICtrlDelete($aListButton[$y][$x])
-				EndIf
-			Next
-		EndIf
+	For $y = 0 To UBound($aListButton, 1) - 1 Step 1
+		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
+			GUICtrlDelete($aListButton[$y][$x])
+		Next
 	Next
 EndFunc   ;==>__RemoveAllButtons
 Func __Resize()
@@ -250,6 +246,8 @@ Func bSaveSettingsClick()
 	If $bEdit Then
 		$bEdit = False
 		__SaveIni()
+		GUISetState(@SW_HIDE, $fGlobalSettings)
+		__Show()
 		__LoadButtons()
 	EndIf
 EndFunc   ;==>bSaveSettingsClick

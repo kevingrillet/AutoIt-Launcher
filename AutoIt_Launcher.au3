@@ -54,15 +54,16 @@
 #Region ### CONSTANTS ###
 ;~ Button struct
 Const $CST_HINT = 0
-Const $CST_ICON = 1
-Const $CST_MODE = 2
-Const $CST_RUN_PROGRAM = 3
-Const $CST_RUN_WORKINGDIR = 4
-Const $CST_SHELL_FILENAME = 5
-Const $CST_SHELL_PARAMETERS = 6
-Const $CST_SHELL_WORKINGDIR = 7
-Const $CST_SCRIPT_PATH = 8
+Const $CST_ICON = $CST_HINT + 1
+Const $CST_MODE = $CST_ICON + 1
+Const $CST_RUN_PROGRAM = $CST_MODE + 1
+Const $CST_RUN_WORKINGDIR = $CST_RUN_PROGRAM + 1
+Const $CST_SHELL_FILENAME = $CST_RUN_WORKINGDIR + 1
+Const $CST_SHELL_PARAMETERS = $CST_SHELL_FILENAME + 1
+Const $CST_SHELL_WORKINGDIR = $CST_SHELL_PARAMETERS + 1
+Const $CST_SCRIPT_PATH = $CST_SHELL_WORKINGDIR + 1
 ;~ Button mode
+Const $CST_UNINITIALIZED = -1
 Const $CST_RUN = 0
 Const $CST_SHELLEXECUTE = 1
 Const $CST_SCRIPT = 2
@@ -133,23 +134,21 @@ Func __BtnClick($CtrlId, $bPrimary = True)
 	Local $buttonID = 0
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			If $y <= UBound($aListButton, 1) And $x <= UBound($aListButton, 2) Then
-				If $aListButton[$y][$x] = $CtrlId Then
-					$buttonID = $y * GUICtrlRead($iCol) + $x
-					If $bPrimary And $buttonID < UBound($aDataButton, 1) Then
-						Switch $aDataButton[$buttonID][$CST_MODE]
-							Case $CST_RUN
-								Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
-							Case $CST_SHELLEXECUTE
-								ShellExecute($aDataButton[$buttonID][$CST_SHELL_FILENAME], $aDataButton[$buttonID][$CST_SHELL_PARAMETERS], $aDataButton[$buttonID][$CST_SHELL_WORKINGDIR])
-							Case $CST_SCRIPT
-								__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
-						EndSwitch
-					Else
-						MsgBox($IDOK, "Not initialized", "Button not initialized / Right Click")
-					EndIf
-					ExitLoop
+			If $aListButton[$y][$x] = $CtrlId Then
+				$buttonID = $y * GUICtrlRead($iCol) + $x
+				If $bPrimary And $buttonID < UBound($aDataButton) And $aDataButton[$buttonID][$CST_MODE] <> $CST_UNINITIALIZED Then
+					Switch $aDataButton[$buttonID][$CST_MODE]
+						Case $CST_RUN
+							Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
+						Case $CST_SHELLEXECUTE
+							ShellExecute($aDataButton[$buttonID][$CST_SHELL_FILENAME], $aDataButton[$buttonID][$CST_SHELL_PARAMETERS], $aDataButton[$buttonID][$CST_SHELL_WORKINGDIR])
+						Case $CST_SCRIPT
+							__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
+					EndSwitch
+				Else
+					MsgBox($IDOK, "Not initialized", "Button not initialized / Right Click")
 				EndIf
+				ExitLoop
 			EndIf
 		Next
 	Next
@@ -191,14 +190,10 @@ Func __RefreshButtons()
 	Local $buttonID = 0
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			$buttonID = $y * GUICtrlRead($iCol) + $x
-			If $y >= UBound($aListButton, 1) Or $x >= UBound($aListButton, 2) Then
-				_ArrayInsert($aListButton, $y & ";" & $x, GUICtrlCreateButton("Button_" & $y & "_" & $x, 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP))
-			Else
-				$aListButton[$y][$x] = GUICtrlCreateButton("Button_" & $y & "_" & $x, 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP)
-			EndIf
+			$buttonID = $y * (GUICtrlRead($iCol) - 1) + $x
+			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP)
 			GUICtrlSetOnEvent(-1, "bButtonClick")
-			If $buttonID < UBound($aDataButton, 1) Then
+			If $buttonID < UBound($aDataButton) And $aDataButton[$buttonID][$CST_MODE] <> $CST_UNINITIALIZED Then
 				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
 				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])
 			EndIf
@@ -219,12 +214,16 @@ EndFunc   ;==>__RemoveAllButtons
 Func __Resize()
 	Local $width = 16 + (48 + 4) * GUICtrlRead($iCol)
 	Local $x = (@DesktopWidth / 2) - ($width / 2)
-	Local $height = 16 + (48 + 4) * GUICtrlRead($iRow)
+	Local $height = 25 + 16 + (48 + 4) * GUICtrlRead($iRow)
 	Local $y = (@DesktopHeight / 2) - ($height / 2)
 	Return WinMove($fAutoItLauncher, "AutoIt Launcher", $x, $y, $width, $height)
 EndFunc   ;==>__Resize
 Func __ResizeArray()
-	ReDim $aListButton[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
+	ReDim $aListButton[GUICtrlRead($iRow) + 1][GUICtrlRead($iCol) + 1]
+	Local $maxButtonID = GUICtrlRead($iRow) * GUICtrlRead($iCol) + 1
+	If $maxButtonID + 1 > UBound($aListButton, 1) Then
+		ReDim $aListButton[$maxButtonID + 1][$CST_SCRIPT_PATH + 1]
+	EndIf
 EndFunc   ;==>__ResizeArray
 ;~ https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=943199
 Func __RunAU3($sFilePath, $sWorkingDir = "", $iShowFlag = @SW_SHOW, $iOptFlag = 0)

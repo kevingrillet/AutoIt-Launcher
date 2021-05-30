@@ -8,8 +8,6 @@
 
  ToDo:
 	Add missing UI [./forms/fButtonSettings]
-	Right click on button in [bButtonClick]
-		https://www.autoitscript.com/forum/topic/74079-check-for-right-click/?do=findComment&comment=1277537
 	Add button / data
 		https://www.autoitscript.com/autoit3/docs/libfunctions/_ArrayInsert.htm
 	Onclick
@@ -73,6 +71,7 @@ Const $CST_SCRIPT = 2
 #Region ### VARIABLES ###
 Local $aListButton[0][0]
 Local $aDataButton[0][0]
+Local $bEdit = False
 Local $sPathButtons = @ScriptDir & "\AutoIt_Launcher_buttons.txt"
 Local $sPathIni = @ScriptDir & "\AutoIt_Launcher.ini"
 Local $sPathLog = @ScriptDir & "\AutoIt_Launcher.log"
@@ -91,26 +90,30 @@ GUISetOnEvent($GUI_EVENT_CLOSE, "fGlobalSettingsClose")
 $lCols = GUICtrlCreateLabel("Columns", 8, 43, 44, 17)
 $lRow = GUICtrlCreateLabel("Row", 8, 11, 26, 17)
 $iRow = GUICtrlCreateInput("1", 56, 8, 89, 21, BitOR($GUI_SS_DEFAULT_INPUT, $ES_RIGHT, $ES_NUMBER))
+GUICtrlSetOnEvent(-1, "__onChange")
 $iCol = GUICtrlCreateInput("1", 56, 40, 89, 21, BitOR($GUI_SS_DEFAULT_INPUT, $ES_RIGHT, $ES_NUMBER))
-$bSaveSettings = GUICtrlCreateButton("Save Global Settings", 8, 96, 139, 25)
-GUICtrlSetOnEvent($bSaveSettings, "bSaveSettingsClick")
+GUICtrlSetOnEvent(-1, "__onChange")
 $cbLog = GUICtrlCreateCheckbox("Save log", 8, 72, 97, 17)
+GUICtrlSetOnEvent(-1, "__onChange")
+$bSaveSettings = GUICtrlCreateButton("Save Global Settings", 8, 96, 139, 25)
+GUICtrlSetOnEvent(-1, "bSaveSettingsClick")
 #EndRegion ### END Koda GUI section ###
 
 #Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fautoitlauncher.kxf
 $fAutoItLauncher = GUICreate("AutoIt Launcher", 615, 437, -1, -1, $WS_SYSMENU)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fAutoItLauncherClose")
+GUISetOnEvent($GUI_EVENT_SECONDARYUP, "fAutoItLauncherSecondaryUp")
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
 
 #Region ### TrayIcon ###
 $miShow = TrayCreateItem("Show AutoIt Launcher")
-TrayItemSetOnEvent($miShow, "__Show")
+TrayItemSetOnEvent(-1, "__Show")
 $miShowSettings = TrayCreateItem("Show Global Settings")
-TrayItemSetOnEvent($miShow, "__ShowGlobalSettings")
+TrayItemSetOnEvent(-1, "__ShowGlobalSettings")
 $miShutDown = TrayCreateItem("Shut Down AutoIt Launcher")
-TrayItemSetOnEvent($miShutDown, "__Exit")
+TrayItemSetOnEvent(-1, "__Exit")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "__Show")
 TraySetToolTip("AutoIt Launcher")
 #EndRegion ### TrayIcon ###
@@ -126,11 +129,43 @@ While 1
 	Sleep(100)
 WEnd
 
+Func __BtnClick($CtrlId, $bPrimary = True)
+	Local $buttonID = 0
+	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+			If $y <= UBound($aListButton, 1) And $x <= UBound($aListButton, 2) Then
+				If $aListButton[$y][$x] = $CtrlId Then
+					$buttonID = $y * GUICtrlRead($iCol) + $x
+					If $bPrimary And $buttonID < UBound($aDataButton, 1) Then
+						Switch $aDataButton[$buttonID][$CST_MODE]
+							Case $CST_RUN
+								Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
+							Case $CST_SHELLEXECUTE
+								ShellExecute($aDataButton[$buttonID][$CST_SHELL_FILENAME], $aDataButton[$buttonID][$CST_SHELL_PARAMETERS], $aDataButton[$buttonID][$CST_SHELL_WORKINGDIR])
+							Case $CST_SCRIPT
+								__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
+						EndSwitch
+					Else
+						MsgBox($IDOK, "Not initialized", "Button not initialized / Right Click")
+					EndIf
+					ExitLoop
+				EndIf
+			EndIf
+		Next
+	Next
+EndFunc   ;==>__BtnClick
 Func __Exit()
 	__SaveIni()
 	__Log("Exiting")
 	Exit
 EndFunc   ;==>__Exit
+Func __GUIVisible()
+	Local $res = False
+	If WinGetState($fAutoItLauncher) = $WIN_STATE_VISIBLE Then $res = True
+	If WinGetState($fGlobalSettings) = $WIN_STATE_VISIBLE Then $res = True
+;~ 	If WinGetState($fButtonSettings) = $WIN_STATE_VISIBLE Then $res = True
+	Return $res
+EndFunc   ;==>__GUIVisible
 Func __LoadButtons()
 	_FileReadToArray($sPathButtons, $aDataButton)
 	__RefreshButtons()
@@ -146,9 +181,13 @@ Func __Log($sToLog)
 		_FileWriteLog($sPathLog, $sToLog & @CRLF)
 	EndIf
 EndFunc   ;==>__Log
+Func __onChange()
+	$bEdit = True
+EndFunc   ;==>__onChange
 Func __RefreshButtons()
 	__Resize()
 	__RemoveAllButtons()
+	__ResizeArray()
 	Local $buttonID = 0
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
@@ -184,6 +223,9 @@ Func __Resize()
 	Local $y = (@DesktopHeight / 2) - ($height / 2)
 	Return WinMove($fAutoItLauncher, "AutoIt Launcher", $x, $y, $width, $height)
 EndFunc   ;==>__Resize
+Func __ResizeArray()
+	ReDim $aListButton[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
+EndFunc   ;==>__ResizeArray
 ;~ https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=943199
 Func __RunAU3($sFilePath, $sWorkingDir = "", $iShowFlag = @SW_SHOW, $iOptFlag = 0)
 	Return Run('"' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
@@ -199,37 +241,37 @@ Func __SaveIni()
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", GUICtrlRead($cbLog))
 EndFunc   ;==>__SaveIni
 Func __Show()
-	GUISetState(@SW_SHOW, $fAutoItLauncher)
+	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fAutoItLauncher)
 EndFunc   ;==>__Show
 Func __ShowGlobalSettings()
-	GUISetState(@SW_SHOW, $fGlobalSettings)
+	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fGlobalSettings)
 EndFunc   ;==>__ShowGlobalSettings
 
 Func bSaveSettingsClick()
-	__SaveIni()
+	If $bEdit Then
+		$bEdit = False
+		__SaveIni()
+		__LoadButtons()
+	EndIf
 EndFunc   ;==>bSaveSettingsClick
 Func bButtonClick()
-	Local $buttonID = 0
-	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			If $aListButton[$y][$x] = @GUI_CtrlId Then
-				$buttonID = $y * GUICtrlRead($iCol) + $x
-				Switch $aDataButton[$buttonID][$CST_MODE]
-					Case $CST_RUN
-						Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
-					Case $CST_SHELLEXECUTE
-						ShellExecute($aDataButton[$buttonID][$CST_SHELL_FILENAME], $aDataButton[$buttonID][$CST_SHELL_PARAMETERS], $aDataButton[$buttonID][$CST_SHELL_WORKINGDIR])
-					Case $CST_SCRIPT
-						__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
-				EndSwitch
-				ExitLoop
-			EndIf
-		Next
-	Next
+	__BtnClick(@GUI_CtrlId)
 EndFunc   ;==>bButtonClick
 Func fAutoItLauncherClose()
 	GUISetState(@SW_HIDE, $fAutoItLauncher)
 EndFunc   ;==>fAutoItLauncherClose
+;~ https://www.autoitscript.com/forum/topic/74079-check-for-right-click/?do=findComment&comment=1277537
+Func fAutoItLauncherSecondaryUp()
+	Local $cInfo = GUIGetCursorInfo($fAutoItLauncher)
+	__BtnClick($cInfo[4], False)
+EndFunc   ;==>fAutoItLauncherSecondaryUp
 Func fGlobalSettingsClose()
+	If $bEdit Then
+		If MsgBox($MB_YESNO, "Save", "Save changes?") = $IDYES Then
+			bSaveSettingsClick()
+		Else
+			__LoadIni()
+		EndIf
+	EndIf
 	GUISetState(@SW_HIDE, $fGlobalSettings)
 EndFunc   ;==>fGlobalSettingsClose

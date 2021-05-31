@@ -193,7 +193,6 @@ Func __BtnClick($CtrlId, $bPrimary = True)
 							__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
 					EndSwitch
 				Else
-					MsgBox($IDOK, "Not initialized", "Button (" & $buttonID & ") not initialized / Right Click")
 					__LoadButtonSettings($buttonID)
 				EndIf
 				ExitLoop
@@ -274,7 +273,7 @@ Func __RefreshButtons()
 	Local $buttonID = 0
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			$buttonID = $y * (GUICtrlRead($iCol) - 1) + $x
+			$buttonID = $y * GUICtrlRead($iCol) + $x
 			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
@@ -415,7 +414,6 @@ Func fButtonSettingsClose()
 			bSaveButtonClick()
 		EndIf
 	EndIf
-	GUISetState(@SW_HIDE, $fButtonSettings)
 EndFunc   ;==>fButtonSettingsClose
 Func rClick()
 	If GUICtrlRead($rRun) = $GUI_CHECKED Then

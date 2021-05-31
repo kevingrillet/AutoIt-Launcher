@@ -7,12 +7,6 @@
 	Small launcher.
 
  ToDo:
-	Test if it's working
-
-	Add button data
-		https://www.autoitscript.com/autoit3/docs/libfunctions/_ArrayInsert.htm
-
- Opt:
 	Drag & Drop files (icon / script)
 		https://www.autoitscript.fr/forum/viewtopic.php?t=14641
 		https://www.autoitscript.fr/autoit3/docs/libfunctions/_WinAPI_DragAcceptFiles.htm
@@ -107,7 +101,7 @@ GUICtrlSetOnEvent(-1, "bSaveSettingsClick")
 #EndRegion ### END Koda GUI section ###
 
 #Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fbuttonsettings.kxf
-$fButtonSettings = GUICreate("Button Settings", 498, 431, 192, 147, $WS_SYSMENU)
+$fButtonSettings = GUICreate("Button Settings", 498, 431, -1, -1, $WS_SYSMENU)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fButtonSettingsClose")
 $lButtonHint = GUICtrlCreateLabel("Button Hint", 16, 19, 57, 17)
 $iButtonHint = GUICtrlCreateInput("", 104, 16, 369, 21)
@@ -189,7 +183,7 @@ Func __BtnClick($CtrlId, $bPrimary = True)
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
 			If $aListButton[$y][$x] = $CtrlId Then
 				$buttonID = $y * GUICtrlRead($iCol) + $x
-				If $bPrimary And $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
+				If $bPrimary And $buttonID <= UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
 					Switch $aDataButton[$buttonID][$CST_MODE]
 						Case $CST_RUN
 							Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
@@ -254,10 +248,10 @@ Func __LoadButtonSettings($buttonID)
 	GUISetState(@SW_SHOW, $fButtonSettings)
 EndFunc   ;==>__LoadButtonSettings
 Func __LoadButtons()
-	__ResizeArray()
 	If FileExists($sPathButtons) Then
 		_FileReadToArray($sPathButtons, $aDataButton, $FRTA_NOCOUNT, "|")
 	EndIf
+	__ResizeArray()
 	__RefreshButtons()
 EndFunc   ;==>__LoadButtons
 Func __LoadIni()

@@ -222,7 +222,7 @@ EndFunc   ;==>__GUIVisible
 Func __LoadButtonSettings($buttonID)
 	$iButtonIDEdit = $buttonID
 	GUISetState(@SW_HIDE, $fAutoItLauncher)
-	If $iButtonIDEdit >= UBound($aDataButton, 1) And $CST_SCRIPT_PATH = UBound($aDataButton, 2) Then
+	If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
 		GUICtrlSetData($iButtonHint, $aDataButton[$iButtonIDEdit][$CST_HINT])
 		GUICtrlSetData($iButtonIcon, $aDataButton[$iButtonIDEdit][$CST_ICON])
 		Switch $aDataButton[$iButtonIDEdit][$CST_MODE]
@@ -281,7 +281,7 @@ Func __RefreshButtons()
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
 			$buttonID = $y * (GUICtrlRead($iCol) - 1) + $x
-			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_BITMAP)
+			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
 				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
@@ -327,17 +327,17 @@ Func __SaveIni()
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "iRow", GUICtrlRead($iRow))
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", GUICtrlRead($cbLog))
 EndFunc   ;==>__SaveIni
-Func __SetEnableButtonSettings($bRun = @SW_DISABLE, $bShell = @SW_DISABLE, $bScript = @SW_DISABLE)
+Func __SetEnableButtonSettings($lbRun = $GUI_DISABLE, $lbShell = $GUI_DISABLE, $lbScript = $GUI_DISABLE)
 ;~ 	Run
-	GUICtrlSetState($bRun, $iRunProgram)
-	GUICtrlSetState($bRun, $iRunWorkingdir)
+	GUICtrlSetState($iRunProgram, $lbRun)
+	GUICtrlSetState($iRunWorkingdir, $lbRun)
 ;~ 	ShellExecute
-	GUICtrlSetState($bShell, $iShellFilename)
-	GUICtrlSetState($bShell, $iShellParameters)
-	GUICtrlSetState($bShell, $iShellWorkingdir)
+	GUICtrlSetState($iShellFilename, $lbShell)
+	GUICtrlSetState($iShellParameters, $lbShell)
+	GUICtrlSetState($iShellWorkingdir, $lbShell)
 ;~ 	Script
-	GUICtrlSetState($bScript, $iScriptPath)
-	GUICtrlSetState($bScript, $bScriptPath)
+	GUICtrlSetState($iScriptPath, $lbScript)
+	GUICtrlSetState($bScriptPath, $lbScript)
 EndFunc   ;==>__SetEnableButtonSettings
 Func __Show()
 	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fAutoItLauncher)
@@ -360,19 +360,14 @@ Func bIconClick()
 EndFunc   ;==>bIconClick
 Func bSaveButtonClick()
 	$bEdit = False
-
-	ConsoleWrite("$iButtonIDEdit = " & $iButtonIDEdit & " // ")
-	ConsoleWrite("$aDataButton[" & UBound($aDataButton) & "][" & UBound($aDataButton, 2) & "]")
-	_ArrayDisplay($aDataButton)
-
 	$aDataButton[$iButtonIDEdit][$CST_HINT] = GUICtrlRead($iButtonHint)
 	$aDataButton[$iButtonIDEdit][$CST_ICON] = GUICtrlRead($iButtonIcon)
 	If GUICtrlRead($rRun) = $GUI_CHECKED Then
-		$aDataButton[$iButtonIDEdit][$CST_MODE] = GUICtrlRead($CST_RUN)
+		$aDataButton[$iButtonIDEdit][$CST_MODE] = $CST_RUN
 	ElseIf GUICtrlRead($rShellExecute) = $GUI_CHECKED Then
-		$aDataButton[$iButtonIDEdit][$CST_MODE] = GUICtrlRead($CST_SHELLEXECUTE)
+		$aDataButton[$iButtonIDEdit][$CST_MODE] = $CST_SHELLEXECUTE
 	ElseIf GUICtrlRead($rCustomScript) = $GUI_CHECKED Then
-		$aDataButton[$iButtonIDEdit][$CST_MODE] = GUICtrlRead($CST_SCRIPT)
+		$aDataButton[$iButtonIDEdit][$CST_MODE] = $CST_SCRIPT
 	EndIf
 	$aDataButton[$iButtonIDEdit][$CST_RUN_PROGRAM] = GUICtrlRead($iRunProgram)
 	$aDataButton[$iButtonIDEdit][$CST_RUN_WORKINGDIR] = GUICtrlRead($iRunWorkingdir)
@@ -380,11 +375,6 @@ Func bSaveButtonClick()
 	$aDataButton[$iButtonIDEdit][$CST_SHELL_PARAMETERS] = GUICtrlRead($iShellParameters)
 	$aDataButton[$iButtonIDEdit][$CST_SHELL_WORKINGDIR] = GUICtrlRead($iShellWorkingdir)
 	$aDataButton[$iButtonIDEdit][$CST_SCRIPT_PATH] = GUICtrlRead($iScriptPath)
-
-	ConsoleWrite("$iButtonIDEdit = " & $iButtonIDEdit & " // ")
-	ConsoleWrite("$aDataButton[" & UBound($aDataButton) & "][" & UBound($aDataButton, 2) & "]")
-	_ArrayDisplay($aDataButton)
-
 	__SaveButtons()
 	$iButtonIDEdit = -1
 	GUISetState(@SW_HIDE, $fButtonSettings)
@@ -435,10 +425,10 @@ Func fButtonSettingsClose()
 EndFunc   ;==>fButtonSettingsClose
 Func rClick()
 	If GUICtrlRead($rRun) = $GUI_CHECKED Then
-		__SetEnableButtonSettings(@SW_ENABLE, @SW_DISABLE, @SW_DISABLE)
+		__SetEnableButtonSettings($GUI_ENABLE, $GUI_DISABLE, $GUI_DISABLE)
 	ElseIf GUICtrlRead($rShellExecute) = $GUI_CHECKED Then
-		__SetEnableButtonSettings(@SW_DISABLE, @SW_ENABLE, @SW_DISABLE)
+		__SetEnableButtonSettings($GUI_DISABLE, $GUI_ENABLE, $GUI_DISABLE)
 	Else
-		__SetEnableButtonSettings(@SW_DISABLE, @SW_DISABLE, @SW_ENABLE)
+		__SetEnableButtonSettings($GUI_DISABLE, $GUI_DISABLE, $GUI_ENABLE)
 	EndIf
 EndFunc   ;==>rClick

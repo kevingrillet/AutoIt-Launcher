@@ -7,9 +7,6 @@
 	Small launcher.
 
  ToDo:
-	Drag & Drop files (icon / script)
-		https://www.autoitscript.fr/forum/viewtopic.php?t=14641
-		https://www.autoitscript.fr/autoit3/docs/libfunctions/_WinAPI_DragAcceptFiles.htm
 	Change order of buttons
 		Drag & Drop
 			https://www.autoitscript.fr/forum/viewtopic.php?t=14808
@@ -72,7 +69,7 @@ Dim $aListButton[1][1]
 Dim $aDataButton[1][$CST_SCRIPT_PATH + 1]
 Local $bEdit = False
 Local $iButtonIDEdit = -1
-Local $sPathButtons = @ScriptDir & "\AutoIt_Launcher_buttons.txt"
+Local $sPathButtons = @ScriptDir & "\AutoIt_Launcher_buttons.data"
 Local $sPathIni = @ScriptDir & "\AutoIt_Launcher.ini"
 Local $sPathLog = @ScriptDir & "\AutoIt_Launcher.log"
 #EndRegion ### VARIABLES ###
@@ -108,6 +105,7 @@ $iButtonHint = GUICtrlCreateInput("", 104, 16, 369, 21)
 GUICtrlSetOnEvent(-1, "__onChange")
 $lButtonIcon = GUICtrlCreateLabel("Icon", 16, 51, 25, 17)
 $iButtonIcon = GUICtrlCreateInput("", 104, 48, 289, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 $bIcon = GUICtrlCreateButton("Open", 400, 47, 74, 23)
 GUICtrlSetOnEvent(-1, "bIconClick")
@@ -117,31 +115,33 @@ GUICtrlSetState(-1, $GUI_CHECKED)
 GUICtrlSetOnEvent(-1, "rClick")
 $rCustomScript = GUICtrlCreateRadio("Custom Script", 16, 304, 113, 17)
 GUICtrlSetOnEvent(-1, "rClick")
+$lRunProgram = GUICtrlCreateLabel("Program", 32, 123, 43, 17)
 $iRunProgram = GUICtrlCreateInput("", 104, 120, 369, 21)
+GUICtrlSetOnEvent(-1, "__onChange")
+$lRunWorkingdir = GUICtrlCreateLabel("Working Dir.", 32, 155, 63, 17)
+$iRunWorkingdir = GUICtrlCreateInput("", 104, 152, 369, 21)
 GUICtrlSetOnEvent(-1, "__onChange")
 $rShellExecute = GUICtrlCreateRadio("ShellExecute", 16, 184, 113, 17)
 GUICtrlSetOnEvent(-1, "rClick")
-$lRunProgram = GUICtrlCreateLabel("Program", 32, 123, 43, 17)
-$iRunWorkingdir = GUICtrlCreateInput("", 104, 152, 369, 21)
-GUICtrlSetOnEvent(-1, "__onChange")
-$lRunWorkingdir = GUICtrlCreateLabel("Working Dir.", 32, 155, 63, 17)
-$lShellParameters = GUICtrlCreateLabel("Parameters", 32, 243, 57, 17)
-$iShellWorkingdir = GUICtrlCreateInput("", 104, 272, 369, 21)
-GUICtrlSetOnEvent(-1, "__onChange")
 $lShellFilename = GUICtrlCreateLabel("Filename", 32, 211, 46, 17)
 $iShellFilename = GUICtrlCreateInput("", 104, 208, 369, 21)
+GUICtrlSetOnEvent(-1, "__onChange")
+$lShellParameters = GUICtrlCreateLabel("Parameters", 32, 243, 57, 17)
+$iShellWorkingdir = GUICtrlCreateInput("", 104, 272, 369, 21)
 GUICtrlSetOnEvent(-1, "__onChange")
 $lShellWorkingdir = GUICtrlCreateLabel("Working Dir.", 32, 275, 63, 17)
 $iShellParameters = GUICtrlCreateInput("", 104, 240, 369, 21)
 GUICtrlSetOnEvent(-1, "__onChange")
+$lScriptPath = GUICtrlCreateLabel("Path", 32, 331, 26, 17)
 $iScriptPath = GUICtrlCreateInput("", 104, 328, 289, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 $bScriptPath = GUICtrlCreateButton("Open", 400, 327, 74, 23)
 GUICtrlSetOnEvent(-1, "bScriptPathClick")
-$lScriptPath = GUICtrlCreateLabel("Path", 32, 331, 26, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $bSaveButton = GUICtrlCreateButton("Save", 7, 368, 475, 25)
 GUICtrlSetOnEvent(-1, "bSaveButtonClick")
+GUISetOnEvent($GUI_EVENT_DROPPED, "__onDrop")
 ;~ GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -267,6 +267,14 @@ EndFunc   ;==>__Log
 Func __onChange()
 	$bEdit = True
 EndFunc   ;==>__onChange
+;~ https://www.autoitscript.com/autoit3/docs/functions/GUISetOnEvent.htm
+Func __onDrop()
+	If @GUI_DropId = $iButtonIcon Then
+		GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+	ElseIf @GUI_DropId = $iScriptPath Then
+		GUICtrlSetData($iScriptPath, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+	EndIf
+EndFunc   ;==>__onDrop
 Func __RefreshButtons()
 	__Resize()
 	__RemoveAllButtons()
@@ -348,7 +356,7 @@ Func bIconClick()
 		FileChangeDir(@ScriptDir)
 	Else
 		FileChangeDir(@ScriptDir)
-		GUICtrlSetData($iButtonIcon, $sFileOpenDialog)
+		GUICtrlSetData($iButtonIcon, StringReplace($sFileOpenDialog, @ScriptDir & "\", ""))
 	EndIf
 EndFunc   ;==>bIconClick
 Func bSaveButtonClick()
@@ -387,7 +395,7 @@ Func bScriptPathClick()
 		FileChangeDir(@ScriptDir)
 	Else
 		FileChangeDir(@ScriptDir)
-		GUICtrlSetData($iScriptPath, $sFileOpenDialog)
+		GUICtrlSetData($iScriptPath, StringReplace($sFileOpenDialog, @ScriptDir & "\", ""))
 	EndIf
 EndFunc   ;==>bScriptPathClick
 Func fAutoItLauncherClose()
@@ -407,6 +415,7 @@ Func fGlobalSettingsClose()
 		EndIf
 	EndIf
 	GUISetState(@SW_HIDE, $fGlobalSettings)
+	__Show()
 EndFunc   ;==>fGlobalSettingsClose
 Func fButtonSettingsClose()
 	If $bEdit Then
@@ -414,6 +423,8 @@ Func fButtonSettingsClose()
 			bSaveButtonClick()
 		EndIf
 	EndIf
+	GUISetState(@SW_HIDE, $fButtonSettings)
+	__Show()
 EndFunc   ;==>fButtonSettingsClose
 Func rClick()
 	If GUICtrlRead($rRun) = $GUI_CHECKED Then

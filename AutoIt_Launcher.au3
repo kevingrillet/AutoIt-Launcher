@@ -6,21 +6,13 @@
  Script Function:
 	Small launcher.
 
- ToDo:
-	Change order of buttons
-		Drag & Drop
-			https://www.autoitscript.fr/forum/viewtopic.php?t=14808
-			https://www.autoitscript.fr/autoit3/docs/functions/GUICtrlSetState.htm
-				GUICtrlSetState(-1, $GUI_DROPACCEPTED)
-				GUISetOnEvent($GUI_EVENT_DROPPED, "fAutoItLauncherDropped")
-		Array swap
-			https://www.autoitscript.com/autoit3/docs/libfunctions/_ArraySwap.htm
-
 #ce ----------------------------------------------------------------------------
+
+#RequireAdmin
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=icons\launcher.ico
-#AutoIt3Wrapper_Outfile=Build\AutoIt_Launcher.exe
+#AutoIt3Wrapper_Outfile=AutoIt_Launcher.exe
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y
 #AutoIt3Wrapper_Res_Description=Small launcher
@@ -98,7 +90,7 @@ GUICtrlSetOnEvent(-1, "bSaveSettingsClick")
 #EndRegion ### END Koda GUI section ###
 
 #Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fbuttonsettings.kxf
-$fButtonSettings = GUICreate("Button Settings", 498, 431, -1, -1, $WS_SYSMENU)
+$fButtonSettings = GUICreate("Button Settings", 498, 431, -1, -1, BitOR($WS_SYSMENU, $WS_EX_ACCEPTFILES))
 GUISetOnEvent($GUI_EVENT_CLOSE, "fButtonSettingsClose")
 $lButtonHint = GUICtrlCreateLabel("Button Hint", 16, 19, 57, 17)
 $iButtonHint = GUICtrlCreateInput("", 104, 16, 369, 21)
@@ -149,6 +141,7 @@ GUISetOnEvent($GUI_EVENT_DROPPED, "__onDrop")
 $fAutoItLauncher = GUICreate("AutoIt Launcher", 615, 437, -1, -1, $WS_SYSMENU)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fAutoItLauncherClose")
 GUISetOnEvent($GUI_EVENT_SECONDARYUP, "fAutoItLauncherSecondaryUp")
+GUISetOnEvent($GUI_EVENT_DROPPED, "__onDrop")
 ;~ GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -267,12 +260,30 @@ EndFunc   ;==>__Log
 Func __onChange()
 	$bEdit = True
 EndFunc   ;==>__onChange
-;~ https://www.autoitscript.com/autoit3/docs/functions/GUISetOnEvent.htm
 Func __onDrop()
-	If @GUI_DropId = $iButtonIcon Then
-		GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
-	ElseIf @GUI_DropId = $iScriptPath Then
-		GUICtrlSetData($iScriptPath, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile) ; TODO: Not working
+	If @GUI_DragId = -1 Then
+		If @GUI_DropId = $iButtonIcon Then
+			GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+		ElseIf @GUI_DropId = $iScriptPath Then
+			GUICtrlSetData($iScriptPath, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+		EndIf
+	Else
+		Local $buttonDrag = -1
+		Local $buttonDrop = -1
+		Local $buttonID = 0
+		For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+				$buttonID = $y * GUICtrlRead($iCol) + $x
+				If @GUI_DragId = $aListButton[$y][$x] Then $buttonDrag = $buttonID
+				If @GUI_DropId = $aListButton[$y][$x] Then $buttonDrop = $buttonID
+				If $buttonDrag <> -1 And $buttonDrop <> -1 Then
+					_ArraySwap($aDataButton, $buttonDrag, $buttonDrop, True)
+					__RefreshButtons()
+					ExitLoop
+				EndIf
+			Next
+		Next
 	EndIf
 EndFunc   ;==>__onDrop
 Func __RefreshButtons()
@@ -285,6 +296,7 @@ Func __RefreshButtons()
 			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
+				GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
 				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])
 			Else
@@ -316,7 +328,7 @@ Func __ResizeArray()
 EndFunc   ;==>__ResizeArray
 ;~ https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=943199
 Func __RunAU3($sFilePath, $sWorkingDir = "", $iShowFlag = @SW_SHOW, $iOptFlag = 0)
-	Return Run('"' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
+	Return Run('"' & @AutoItExe & '" /AutoIt3ExecuteScript "' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
 EndFunc   ;==>__RunAU3
 Func __SaveButtons()
 	_FileWriteFromArray($sPathButtons, $aDataButton)

@@ -8,7 +8,7 @@
 
 #ce ----------------------------------------------------------------------------
 
-#RequireAdmin
+;~ #RequireAdmin
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=icons\launcher.ico
@@ -90,7 +90,7 @@ GUICtrlSetOnEvent(-1, "bSaveSettingsClick")
 #EndRegion ### END Koda GUI section ###
 
 #Region ### START Koda GUI section ### Form=d:\users\kevin\documents\github\autoit-launcher\forms\fbuttonsettings.kxf
-$fButtonSettings = GUICreate("Button Settings", 498, 431, -1, -1, BitOR($WS_SYSMENU, $WS_EX_ACCEPTFILES))
+$fButtonSettings = GUICreate("Button Settings", 498, 431, -1, -1, $WS_SYSMENU, $WS_EX_ACCEPTFILES)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fButtonSettingsClose")
 $lButtonHint = GUICtrlCreateLabel("Button Hint", 16, 19, 57, 17)
 $iButtonHint = GUICtrlCreateInput("", 104, 16, 369, 21)
@@ -261,7 +261,7 @@ Func __onChange()
 	$bEdit = True
 EndFunc   ;==>__onChange
 Func __onDrop()
-	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile) ; TODO: Not working
+	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile)
 	If @GUI_DragId = -1 Then
 		If @GUI_DropId = $iButtonIcon Then
 			GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))

@@ -139,7 +139,7 @@ GUISetOnEvent($GUI_EVENT_DROPPED, "__onDrop")
 $fAutoItLauncher = GUICreate("AutoIt Launcher", 615, 437, -1, -1, $WS_SYSMENU)
 GUISetOnEvent($GUI_EVENT_CLOSE, "fAutoItLauncherClose")
 GUISetOnEvent($GUI_EVENT_SECONDARYUP, "fAutoItLauncherSecondaryUp")
-GUISetOnEvent($GUI_EVENT_DROPPED, "__onDrop")
+GUISetOnEvent($GUI_EVENT_PRIMARYDOWN, "__onDrag")
 ;~ GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -263,8 +263,47 @@ EndFunc   ;==>__Log
 Func __onChange()
 	$bEdit = True
 EndFunc   ;==>__onChange
+Func __OnDrag()
+	Local $buttonDrag = -1
+	Local $buttonDrop = -1
+	Local $buttonID = 0
+	; If the mouse button is pressed - get info about where
+	Local $cInfo = GUIGetCursorInfo($fAutoItLauncher)
+	; Is it over a button
+	$iControl = $cInfo[4]
+	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+			$buttonID = $y * GUICtrlRead($iCol) + $x
+			If $cInfo[4] = $aListButton[$y][$x] Then
+				$buttonDrag = $buttonID
+				ExitLoop
+			EndIf
+		Next
+	Next
+	If $buttonDrag <> -1 Then
+		; And then until the mouse button is released
+		Do
+			$cInfo = GUIGetCursorInfo($fAutoItLauncher)
+		Until Not $cInfo[2]
+		; See if the mouse was released over another button
+		For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
+			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+				$buttonID = $y * GUICtrlRead($iCol) + $x
+				If $cInfo[4] = $aListButton[$y][$x] Then
+					$buttonDrop = $buttonID
+					ExitLoop
+				EndIf
+			Next
+		Next
+	EndIf
+	If $buttonDrop <> -1 And $buttonDrag <> $buttonDrop Then
+		_ArraySwap($aDataButton, $buttonDrag, $buttonDrop)
+		__SaveButtons()
+		__RefreshButtons()
+	EndIf
+EndFunc   ;==>__OnDrag
 Func __onDrop()
-	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile)
+;~ 	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile)
 	If @GUI_DragId = -1 Then
 		__onChange()
 		Local $sPath = @GUI_DragFile
@@ -292,22 +331,6 @@ Func __onDrop()
 				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .au3 but your file is " & $sExtension)
 			EndIf
 		EndIf
-	Else
-		Local $buttonDrag = -1
-		Local $buttonDrop = -1
-		Local $buttonID = 0
-		For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-				$buttonID = $y * GUICtrlRead($iCol) + $x
-				If @GUI_DragId = $aListButton[$y][$x] Then $buttonDrag = $buttonID
-				If @GUI_DropId = $aListButton[$y][$x] Then $buttonDrop = $buttonID
-				If $buttonDrag <> -1 And $buttonDrop <> -1 Then
-					_ArraySwap($aDataButton, $buttonDrag, $buttonDrop, True)
-					__RefreshButtons()
-					ExitLoop
-				EndIf
-			Next
-		Next
 	EndIf
 EndFunc   ;==>__onDrop
 Func __RefreshButtons()
@@ -319,7 +342,6 @@ Func __RefreshButtons()
 			$buttonID = $y * GUICtrlRead($iCol) + $x
 			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
-			GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
 				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
 				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])

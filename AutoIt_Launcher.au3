@@ -270,7 +270,6 @@ Func __OnDrag()
 	; If the mouse button is pressed - get info about where
 	Local $cInfo = GUIGetCursorInfo($fAutoItLauncher)
 	; Is it over a button
-	$iControl = $cInfo[4]
 	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
 		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
 			$buttonID = $y * GUICtrlRead($iCol) + $x

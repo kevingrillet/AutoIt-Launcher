@@ -8,8 +8,6 @@
 
 #ce ----------------------------------------------------------------------------
 
-;~ #RequireAdmin
-
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=icons\launcher.ico
 #AutoIt3Wrapper_Outfile=AutoIt_Launcher.exe

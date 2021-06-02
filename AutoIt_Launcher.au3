@@ -263,8 +263,10 @@ Func __onDrop()
 	If @GUI_DragId = -1 Then
 		If @GUI_DropId = $iButtonIcon Then
 			GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+			__onChange()
 		ElseIf @GUI_DropId = $iScriptPath Then
 			GUICtrlSetData($iScriptPath, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
+			__onChange()
 		EndIf
 	Else
 		Local $buttonDrag = -1

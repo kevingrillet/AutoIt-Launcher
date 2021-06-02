@@ -196,6 +196,11 @@ Func __Exit()
 	__Log("Exiting")
 	Exit
 EndFunc   ;==>__Exit
+Func __GetExtension($sFilePath)
+	Local $sDrive, $sDir, $sFileName, $sExtension
+	_PathSplit($sFilePath, $sDrive, $sDir, $sFileName, $sExtension)
+	Return $sExtension
+EndFunc   ;==>__GetExtension
 Func __GUIVisible()
 	Local $res = False
 	If WinGetState($fAutoItLauncher) = $WIN_STATE_VISIBLE Then $res = True
@@ -261,12 +266,31 @@ EndFunc   ;==>__onChange
 Func __onDrop()
 	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile)
 	If @GUI_DragId = -1 Then
+		__onChange()
+		Local $sPath = @GUI_DragFile
+		Local $sExtension = __GetExtension($sPath)
 		If @GUI_DropId = $iButtonIcon Then
-			GUICtrlSetData($iButtonIcon, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
-			__onChange()
+			If $sExtension = ".ico" Then
+				GUICtrlSetData($iButtonIcon, StringReplace($sPath, @ScriptDir & "\", ""))
+			Else
+				If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
+					GUICtrlSetData($iButtonIcon, $aDataButton[$iButtonIDEdit][$CST_ICON])
+				Else
+					GUICtrlSetData($iButtonIcon, "")
+				EndIf
+				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .ico but your file is " & $sExtension)
+			EndIf
 		ElseIf @GUI_DropId = $iScriptPath Then
-			GUICtrlSetData($iScriptPath, StringReplace(@GUI_DragFile, @ScriptDir & "\", ""))
-			__onChange()
+			If $sExtension = ".au3" Then
+				GUICtrlSetData($iScriptPath, StringReplace($sPath, @ScriptDir & "\", ""))
+			Else
+				If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
+					GUICtrlSetData($iScriptPath, $aDataButton[$iButtonIDEdit][$CST_SCRIPT_PATH])
+				Else
+					GUICtrlSetData($iScriptPath, "")
+				EndIf
+				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .au3 but your file is " & $sExtension)
+			EndIf
 		EndIf
 	Else
 		Local $buttonDrag = -1

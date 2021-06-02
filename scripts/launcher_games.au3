@@ -15,8 +15,9 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 	EndIf
 EndFunc   ;==>__RunIfNotRunning
 
-__RunIfNotRunning("Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net Launcher.exe")
+;~ __RunIfNotRunning("Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net Launcher.exe")
 __RunIfNotRunning("EpicGamesLauncher.exe", "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe")
 __RunIfNotRunning("GalaxyClient.exe", "C:\Program Files (x86)\GOG Galaxy\GalaxyClient.exe")
+;~ __RunIfNotRunning("Origin.exe", "D:\Program Files\Origin\Origin.exe")
 __RunIfNotRunning("steam.exe", "C:\Program Files (x86)\Steam\steam.exe")
 __RunIfNotRunning("upc.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\Uplay.exe")

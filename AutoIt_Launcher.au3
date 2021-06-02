@@ -295,8 +295,8 @@ Func __RefreshButtons()
 			$buttonID = $y * GUICtrlRead($iCol) + $x
 			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
+			GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
-				GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 				GUICtrlSetTip(-1, $aDataButton[$buttonID][$CST_HINT])
 				GUICtrlSetImage(-1, $aDataButton[$buttonID][$CST_ICON])
 			Else

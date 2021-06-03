@@ -26,6 +26,10 @@
 #AutoIt3Wrapper_Run_Tidy=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
+#Region ### PRAGMA ###
+#pragma compile(AutoItExecuteAllowed, True)
+#EndRegion ### PRAGMA ###
+
 #Region ### INCLUDES ###
 #include <Array.au3>
 #include <ButtonConstants.au3>

@@ -1,3 +1,13 @@
+#cs ----------------------------------------------------------------------------
+
+ AutoIt Version: 3.3.14.5
+ Author:         kevingrillet
+
+ Script Function:
+	Launch downloaders.
+
+#ce ----------------------------------------------------------------------------
+
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_type=a3x
 #AutoIt3Wrapper_Icon=..\icons\downloader.ico
@@ -14,15 +24,8 @@
 #AutoIt3Wrapper_Res_Field=Github|https://github.com/kevingrillet/AutoIt-Launcher
 #AutoIt3Wrapper_Run_Tidy=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#cs ----------------------------------------------------------------------------
 
- AutoIt Version: 3.3.14.5
- Author:         kevingrillet
-
- Script Function:
-	Launch downloaders.
-
-#ce ----------------------------------------------------------------------------
+Opt("MustDeclareVars", 1) ;0=no, 1=require pre-declaration
 
 Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 	If Not ProcessExists($process) Then

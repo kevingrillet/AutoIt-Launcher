@@ -1,9 +1,10 @@
 # Custom
 BackUp
-AutoIt_Launcher.exe
-AutoIt_Launcher.ini
-AutoIt_Launcher.log
-AutoIt_Launcher_buttons.data
+*.a3x
+*.exe
+*.ini
+*.log
+*.data
 
 # https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
 .vscode/*

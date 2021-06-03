@@ -14,7 +14,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y
 #AutoIt3Wrapper_Res_Description=Small launcher
-#AutoIt3Wrapper_Res_Fileversion=0.0.0.1
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
 #AutoIt3Wrapper_Res_LegalCopyright=Copyright (C) 2021
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_Field=Compiler Date|%date%
@@ -174,10 +174,10 @@ WEnd
 
 Func __BtnClick($CtrlId, $bPrimary = True)
 	Local $buttonID = 0
-	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
+	For $y = 0 To UBound($aListButton) - 1 Step 1
+		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
 			If $aListButton[$y][$x] = $CtrlId Then
-				$buttonID = $y * GUICtrlRead($iCol) + $x
+				$buttonID = $y * UBound($aListButton, 2) + $x
 				If $bPrimary And $buttonID <= UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
 					Switch $aDataButton[$buttonID][$CST_MODE]
 						Case $CST_RUN
@@ -274,9 +274,9 @@ Func __OnDrag()
 	; If the mouse button is pressed - get info about where
 	Local $cInfo = GUIGetCursorInfo($fAutoItLauncher)
 	; Is it over a button
-	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			$buttonID = $y * GUICtrlRead($iCol) + $x
+	For $y = 0 To UBound($aListButton) - 1 Step 1
+		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
+			$buttonID = $y * UBound($aListButton, 2) + $x
 			If $cInfo[4] = $aListButton[$y][$x] Then
 				$buttonDrag = $buttonID
 				ExitLoop
@@ -289,9 +289,9 @@ Func __OnDrag()
 			$cInfo = GUIGetCursorInfo($fAutoItLauncher)
 		Until Not $cInfo[2]
 		; See if the mouse was released over another button
-		For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-			For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-				$buttonID = $y * GUICtrlRead($iCol) + $x
+		For $y = 0 To UBound($aListButton) - 1 Step 1
+			For $x = 0 To UBound($aListButton, 2) - 1 Step 1
+				$buttonID = $y * UBound($aListButton, 2) + $x
 				If $cInfo[4] = $aListButton[$y][$x] Then
 					$buttonDrop = $buttonID
 					ExitLoop
@@ -323,7 +323,8 @@ Func __onDrop()
 				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .ico but your file is " & $sExtension)
 			EndIf
 		ElseIf @GUI_DropId = $iScriptPath Then
-			If $sExtension = ".au3" Then
+			Local $aTmp = [".a3x", ".au3"]
+			If _ArraySearch($aTmp, $sExtension) <> -1 Then
 				GUICtrlSetData($iScriptPath, StringReplace($sPath, @ScriptDir & "\", ""))
 			Else
 				If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
@@ -331,7 +332,7 @@ Func __onDrop()
 				Else
 					GUICtrlSetData($iScriptPath, "")
 				EndIf
-				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .au3 but your file is " & $sExtension)
+				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .a3x or .au3 but your file is " & $sExtension)
 			EndIf
 		EndIf
 	EndIf
@@ -340,9 +341,9 @@ Func __RefreshButtons()
 	__Resize()
 	__RemoveAllButtons()
 	Local $buttonID = 0
-	For $y = 0 To GUICtrlRead($iRow) - 1 Step 1
-		For $x = 0 To GUICtrlRead($iCol) - 1 Step 1
-			$buttonID = $y * GUICtrlRead($iCol) + $x
+	For $y = 0 To UBound($aListButton) - 1 Step 1
+		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
+			$buttonID = $y * UBound($aListButton, 2) + $x
 			$aListButton[$y][$x] = GUICtrlCreateButton("", 8 + (48 + 4) * $x, 8 + (48 + 4) * $y, 48, 48, $BS_ICON)
 			GUICtrlSetOnEvent(-1, "bClick")
 			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
@@ -355,7 +356,7 @@ Func __RefreshButtons()
 	Next
 EndFunc   ;==>__RefreshButtons
 Func __RemoveAllButtons()
-	For $y = 0 To UBound($aListButton, 1) - 1 Step 1
+	For $y = 0 To UBound($aListButton) - 1 Step 1
 		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
 			GUICtrlDelete($aListButton[$y][$x])
 		Next
@@ -369,7 +370,7 @@ Func __Resize()
 	Return WinMove($fAutoItLauncher, "AutoIt Launcher", $x, $y, $width, $height)
 EndFunc   ;==>__Resize
 Func __ResizeArray()
-	ReDim $aListButton[GUICtrlRead($iRow) + 1][GUICtrlRead($iCol) + 1]
+	ReDim $aListButton[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
 	Local $maxButtonID = GUICtrlRead($iRow) * GUICtrlRead($iCol)
 	If $maxButtonID > UBound($aDataButton) Then
 		ReDim $aDataButton[$maxButtonID][$CST_SCRIPT_PATH + 1]
@@ -451,7 +452,7 @@ Func bSaveSettingsClick()
 	__LoadButtons()
 EndFunc   ;==>bSaveSettingsClick
 Func bScriptPathClick()
-	Local $sFileOpenDialog = FileOpenDialog("Open File", @ScriptDir & "\scripts\", "AutoIt (*.au3)", $FD_FILEMUSTEXIST)
+	Local $sFileOpenDialog = FileOpenDialog("Open File", @ScriptDir & "\scripts\", "AutoIt (*.a3x;*.au3)", $FD_FILEMUSTEXIST)
 	If @error Then
 		FileChangeDir(@ScriptDir)
 	Else

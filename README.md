@@ -9,7 +9,7 @@
 Small launcher for my scripts.
 
 ![AutoIt3_2021-06-01_20-40_55xSX](https://user-images.githubusercontent.com/7203617/120532108-a0ede280-c3df-11eb-8706-018f30480a6c.png)
- 
+
 ## Easy configuration
 
 ### Button settings

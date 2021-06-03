@@ -23,3 +23,10 @@ By doing a right click on a button.
 Show Global Settings from TrayIcon.
 
 ![AutoIt_Launcher_2021-06-02_20-16_2WIce](https://user-images.githubusercontent.com/7203617/120532015-874c9b00-c3df-11eb-94c8-13cd3a8b854a.png)
+
+## Ressources
+
+- [Drag & Drop files](https://www.autoitscript.fr/forum/viewtopic.php?f=3&t=15655&p=106879#p106879)
+- [Drag & Drop buttons](https://www.autoitscript.com/forum/topic/143645-drag-drop-a-gui-element/?tab=comments#comment-1011658)
+- [Execute uncompile AutoIt files](https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=1350189)
+- [Right Click](https://www.autoitscript.com/forum/topic/74079-check-for-right-click/?do=findComment&comment=1277537)

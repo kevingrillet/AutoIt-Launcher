@@ -1,3 +1,19 @@
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile_type=a3x
+#AutoIt3Wrapper_Icon=..\icons\game_launchers.ico
+#AutoIt3Wrapper_Outfile=launcher_games.a3x
+#AutoIt3Wrapper_Compression=4
+#AutoIt3Wrapper_UseUpx=y
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
+#AutoIt3Wrapper_Res_LegalCopyright=Copyright (C) 2021
+#AutoIt3Wrapper_Res_Language=1033
+#AutoIt3Wrapper_Res_Field=Compiler Date|%date%
+#AutoIt3Wrapper_Res_Field=Compiler Heure|%time%
+#AutoIt3Wrapper_Res_Field=Compiler Version|AutoIt v%AutoItVer%
+#AutoIt3Wrapper_Res_Field=Author|kevingrillet
+#AutoIt3Wrapper_Res_Field=Github|https://github.com/kevingrillet/AutoIt-Launcher
+#AutoIt3Wrapper_Run_Tidy=y
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #cs ----------------------------------------------------------------------------
 
  AutoIt Version: 3.3.14.5

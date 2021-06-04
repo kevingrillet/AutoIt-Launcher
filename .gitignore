@@ -5,6 +5,7 @@ BackUp
 *.ini
 *.log
 *.data
+!msedgedriver.exe
 
 # https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
 .vscode/*

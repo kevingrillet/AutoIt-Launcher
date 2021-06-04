@@ -112,20 +112,24 @@ Local $rCustomScript = GUICtrlCreateRadio("Custom Script", 16, 304, 113, 17)
 GUICtrlSetOnEvent(-1, "rClick")
 Local $lRunProgram = GUICtrlCreateLabel("Program", 32, 123, 43, 17)
 Local $iRunProgram = GUICtrlCreateInput("", 104, 120, 369, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 Local $lRunWorkingdir = GUICtrlCreateLabel("Working Dir.", 32, 155, 63, 17)
 Local $iRunWorkingdir = GUICtrlCreateInput("", 104, 152, 369, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 Local $rShellExecute = GUICtrlCreateRadio("ShellExecute", 16, 184, 113, 17)
 GUICtrlSetOnEvent(-1, "rClick")
 Local $lShellFilename = GUICtrlCreateLabel("Filename", 32, 211, 46, 17)
 Local $iShellFilename = GUICtrlCreateInput("", 104, 208, 369, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 Local $lShellParameters = GUICtrlCreateLabel("Parameters", 32, 243, 57, 17)
 Local $iShellWorkingdir = GUICtrlCreateInput("", 104, 272, 369, 21)
 GUICtrlSetOnEvent(-1, "__onChange")
 Local $lShellWorkingdir = GUICtrlCreateLabel("Working Dir.", 32, 275, 63, 17)
 Local $iShellParameters = GUICtrlCreateInput("", 104, 240, 369, 21)
+GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 GUICtrlSetOnEvent(-1, "__onChange")
 Local $lScriptPath = GUICtrlCreateLabel("Path", 32, 331, 26, 17)
 Local $iScriptPath = GUICtrlCreateInput("", 104, 328, 289, 21)
@@ -201,6 +205,11 @@ Func __Exit()
 	__Log("Exiting")
 	Exit
 EndFunc   ;==>__Exit
+Func __GetPath($sFilePath)
+	Local $sDrive, $sDir, $sFileName, $sExtension
+	_PathSplit($sFilePath, $sDrive, $sDir, $sFileName, $sExtension)
+	Return $sDrive & $sDir
+EndFunc   ;==>__GetPath
 Func __GetExtension($sFilePath)
 	Local $sDrive, $sDir, $sFileName, $sExtension
 	_PathSplit($sFilePath, $sDrive, $sDir, $sFileName, $sExtension)
@@ -322,6 +331,35 @@ Func __onDrop()
 					GUICtrlSetData($iButtonIcon, "")
 				EndIf
 				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .ico but your file is " & $sExtension)
+			EndIf
+		ElseIf @GUI_DropId = $iRunProgram Or @GUI_DropId = $iRunWorkingdir Then
+			If $sExtension = ".exe" Then
+				GUICtrlSetData($iRunProgram, StringReplace($sPath, @ScriptDir & "\", ""))
+				GUICtrlSetData($iRunWorkingdir, StringReplace(__GetPath($sPath), @ScriptDir & "\", ""))
+			Else
+				If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
+					GUICtrlSetData($iRunProgram, $aDataButton[$iButtonIDEdit][$CST_RUN_PROGRAM])
+					GUICtrlSetData($iRunWorkingdir, $aDataButton[$iButtonIDEdit][$CST_RUN_WORKINGDIR])
+				Else
+					GUICtrlSetData($iRunProgram, "")
+					GUICtrlSetData($iRunWorkingdir, "")
+				EndIf
+				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .exe but your file is " & $sExtension)
+			EndIf
+		ElseIf @GUI_DropId = $iShellFilename Or @GUI_DropId = $iShellWorkingdir Then
+			Local $aTmp = [".sh", ".bat"]
+			If _ArraySearch($aTmp, $sExtension) <> -1 Then
+				GUICtrlSetData($iShellFilename, StringReplace($sPath, @ScriptDir & "\", ""))
+				GUICtrlSetData($iShellWorkingdir, StringReplace(__GetPath($sPath), @ScriptDir & "\", ""))
+			Else
+				If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
+					GUICtrlSetData($iShellFilename, $aDataButton[$iButtonIDEdit][$CST_SHELL_FILENAME])
+					GUICtrlSetData($iShellWorkingdir, $aDataButton[$iButtonIDEdit][$CST_SHELL_WORKINGDIR])
+				Else
+					GUICtrlSetData($iShellFilename, "")
+					GUICtrlSetData($iShellWorkingdir, "")
+				EndIf
+				MsgBox($MB_ICONWARNING, "Wrong file extension", "The expected file extension is .sh or .bat but your file is " & $sExtension)
 			EndIf
 		ElseIf @GUI_DropId = $iScriptPath Then
 			Local $aTmp = [".a3x", ".au3"]

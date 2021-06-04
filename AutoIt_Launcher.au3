@@ -231,9 +231,15 @@ Func __LoadButtonSettings($buttonID)
 		Switch $aDataButton[$iButtonIDEdit][$CST_MODE]
 			Case $CST_RUN
 				GUICtrlSetState($rRun, $GUI_CHECKED)
+				GUICtrlSetState($rShellExecute, $GUI_UNCHECKED)
+				GUICtrlSetState($rCustomScript, $GUI_UNCHECKED)
 			Case $CST_SHELLEXECUTE
+				GUICtrlSetState($rRun, $GUI_UNCHECKED)
 				GUICtrlSetState($rShellExecute, $GUI_CHECKED)
+				GUICtrlSetState($rCustomScript, $GUI_UNCHECKED)
 			Case $CST_SCRIPT
+				GUICtrlSetState($rRun, $GUI_UNCHECKED)
+				GUICtrlSetState($rShellExecute, $GUI_UNCHECKED)
 				GUICtrlSetState($rCustomScript, $GUI_CHECKED)
 		EndSwitch
 		GUICtrlSetData($iRunProgram, $aDataButton[$iButtonIDEdit][$CST_RUN_PROGRAM])
@@ -246,6 +252,8 @@ Func __LoadButtonSettings($buttonID)
 		GUICtrlSetData($iButtonHint, "")
 		GUICtrlSetData($iButtonIcon, "")
 		GUICtrlSetState($rRun, $GUI_CHECKED)
+		GUICtrlSetState($rShellExecute, $GUI_UNCHECKED)
+		GUICtrlSetState($rCustomScript, $GUI_UNCHECKED)
 		GUICtrlSetData($iRunProgram, "")
 		GUICtrlSetData($iRunWorkingdir, "")
 		GUICtrlSetData($iShellFilename, "")
@@ -486,7 +494,7 @@ EndFunc   ;==>bSaveButtonClick
 Func bSaveSettingsClick()
 	$bEdit = False
 	__SaveIni()
-	GUISetState(@SW_HIDE, $fButtonSettings)
+	GUISetState(@SW_HIDE, $fGlobalSettings)
 	__Show()
 	__LoadButtons()
 EndFunc   ;==>bSaveSettingsClick

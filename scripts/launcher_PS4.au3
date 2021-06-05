@@ -10,7 +10,7 @@
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_type=a3x
-#AutoIt3Wrapper_Icon=..\icons\ps_remote_play.ico
+#AutoIt3Wrapper_Icon=..\icons\x48\ps_remote_play.ico
 #AutoIt3Wrapper_Outfile=launcher_PS4.a3x
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y

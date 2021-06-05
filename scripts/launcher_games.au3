@@ -10,7 +10,7 @@
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_type=a3x
-#AutoIt3Wrapper_Icon=..\icons\game_launchers.ico
+#AutoIt3Wrapper_Icon=..\icons\x48\game_launchers.ico
 #AutoIt3Wrapper_Outfile=launcher_games.a3x
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y

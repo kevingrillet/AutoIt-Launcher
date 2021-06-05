@@ -10,7 +10,7 @@
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_type=a3x
-#AutoIt3Wrapper_Icon=..\icons\afk_arena.ico
+#AutoIt3Wrapper_Icon=..\icons\x48\afk_arena.ico
 #AutoIt3Wrapper_Outfile=launcher_afk_daily.a3x
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y
@@ -35,4 +35,4 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 EndFunc   ;==>__RunIfNotRunning
 
 __RunIfNotRunning("Bluestacks.exe", "C:\Program Files\BlueStacks\Bluestacks.exe", "C:\Program Files\BlueStacks\", 30)
-ShellExecute("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily-fork")
+ShellExecute("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")

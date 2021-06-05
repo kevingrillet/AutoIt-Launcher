@@ -10,7 +10,7 @@
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_type=a3x
-#AutoIt3Wrapper_Icon=..\icons\EpicGamesStore.ico
+#AutoIt3Wrapper_Icon=..\icons\x48\EpicGamesStore.ico
 #AutoIt3Wrapper_Outfile=check_EpicGames_Free.a3x
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y

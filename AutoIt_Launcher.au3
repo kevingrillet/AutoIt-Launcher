@@ -9,7 +9,7 @@
 #ce ----------------------------------------------------------------------------
 
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=icons\launcher.ico
+#AutoIt3Wrapper_Icon=icons\x48\launcher.ico
 #AutoIt3Wrapper_Outfile=AutoIt_Launcher.exe
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y
@@ -33,6 +33,7 @@
 #Region ### INCLUDES ###
 #include <Array.au3>
 #include <ButtonConstants.au3>
+#include <Date.au3>
 #include <EditConstants.au3>
 #include <File.au3>
 #include <GUIConstantsEx.au3>
@@ -158,6 +159,7 @@ Local $miShow = TrayCreateItem("Show AutoIt Launcher")
 TrayItemSetOnEvent(-1, "__Show")
 Local $miShowSettings = TrayCreateItem("Show Global Settings")
 TrayItemSetOnEvent(-1, "__ShowGlobalSettings")
+TrayCreateItem("")
 Local $miShutDown = TrayCreateItem("Shut Down AutoIt Launcher")
 TrayItemSetOnEvent(-1, "__Exit")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "__Show")
@@ -178,6 +180,7 @@ While 1
 WEnd
 
 Func __BtnClick($CtrlId, $bPrimary = True)
+	__Log("__BtnClick")
 	Local $buttonID = 0
 	For $y = 0 To UBound($aListButton) - 1 Step 1
 		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
@@ -201,21 +204,24 @@ Func __BtnClick($CtrlId, $bPrimary = True)
 	Next
 EndFunc   ;==>__BtnClick
 Func __Exit()
-	__SaveIni()
 	__Log("Exiting")
+	__SaveIni()
 	Exit
 EndFunc   ;==>__Exit
 Func __GetPath($sFilePath)
+	__Log("__GetPath(" & $sFilePath & ")")
 	Local $sDrive, $sDir, $sFileName, $sExtension
 	_PathSplit($sFilePath, $sDrive, $sDir, $sFileName, $sExtension)
 	Return $sDrive & $sDir
 EndFunc   ;==>__GetPath
 Func __GetExtension($sFilePath)
+	__Log("__GetExtension(" & $sFilePath & ")")
 	Local $sDrive, $sDir, $sFileName, $sExtension
 	_PathSplit($sFilePath, $sDrive, $sDir, $sFileName, $sExtension)
 	Return $sExtension
 EndFunc   ;==>__GetExtension
 Func __GUIVisible()
+	__Log("__GUIVisible")
 	Local $res = False
 	If WinGetState($fAutoItLauncher) = $WIN_STATE_VISIBLE Then $res = True
 	If WinGetState($fGlobalSettings) = $WIN_STATE_VISIBLE Then $res = True
@@ -223,6 +229,7 @@ Func __GUIVisible()
 	Return $res
 EndFunc   ;==>__GUIVisible
 Func __LoadButtonSettings($buttonID)
+	__Log("__LoadButtonSettings(" & $buttonID & ")")
 	$iButtonIDEdit = $buttonID
 	GUISetState(@SW_HIDE, $fAutoItLauncher)
 	If $iButtonIDEdit <= UBound($aDataButton, 1) And $CST_SCRIPT_PATH + 1 = UBound($aDataButton, 2) Then
@@ -265,6 +272,7 @@ Func __LoadButtonSettings($buttonID)
 	GUISetState(@SW_SHOW, $fButtonSettings)
 EndFunc   ;==>__LoadButtonSettings
 Func __LoadButtons()
+	__Log("__LoadButtons")
 	If FileExists($sPathButtons) Then
 		_FileReadToArray($sPathButtons, $aDataButton, $FRTA_NOCOUNT, "|")
 	EndIf
@@ -278,14 +286,17 @@ Func __LoadIni()
 	GUICtrlSetState($cbLog, IniRead($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", $GUI_UNCHECKED))
 EndFunc   ;==>__LoadIni
 Func __Log($sToLog)
+	ConsoleWrite(_NowCalc() & " : " & $sToLog & @CRLF)
 	If GUICtrlRead($cbLog) = $GUI_CHECKED Then
 		_FileWriteLog($sPathLog, $sToLog & @CRLF)
 	EndIf
 EndFunc   ;==>__Log
 Func __onChange()
+	__Log("__onChange")
 	$bEdit = True
 EndFunc   ;==>__onChange
 Func __OnDrag()
+	__Log("__OnDrag")
 	Local $buttonDrag = -1
 	Local $buttonDrop = -1
 	Local $buttonID = 0
@@ -324,7 +335,7 @@ Func __OnDrag()
 	EndIf
 EndFunc   ;==>__OnDrag
 Func __onDrop()
-;~ 	MsgBox($MB_SYSTEMMODAL, "Debug", "DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile)
+	__Log("__onDrop [DragId: " & @GUI_DragId & @CRLF & "DropId: " & @GUI_DropId & @CRLF & "DragFile: " & @GUI_DragFile & "]")
 	If @GUI_DragId = -1 Then
 		__onChange()
 		Local $sPath = @GUI_DragFile
@@ -385,6 +396,7 @@ Func __onDrop()
 	EndIf
 EndFunc   ;==>__onDrop
 Func __RefreshButtons()
+	__Log("__RefreshButtons")
 	__Resize()
 	__RemoveAllButtons()
 	Local $buttonID = 0
@@ -403,6 +415,7 @@ Func __RefreshButtons()
 	Next
 EndFunc   ;==>__RefreshButtons
 Func __RemoveAllButtons()
+	__Log("__RemoveAllButtons")
 	For $y = 0 To UBound($aListButton) - 1 Step 1
 		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
 			GUICtrlDelete($aListButton[$y][$x])
@@ -410,6 +423,7 @@ Func __RemoveAllButtons()
 	Next
 EndFunc   ;==>__RemoveAllButtons
 Func __Resize()
+	__Log("__Resize")
 	Local $width = 16 + (48 + 4) * GUICtrlRead($iCol)
 	Local $x = (@DesktopWidth / 2) - ($width / 2)
 	Local $height = 25 + 16 + (48 + 4) * GUICtrlRead($iRow)
@@ -417,6 +431,7 @@ Func __Resize()
 	Return WinMove($fAutoItLauncher, "AutoIt Launcher", $x, $y, $width, $height)
 EndFunc   ;==>__Resize
 Func __ResizeArray()
+	__Log("__ResizeArray")
 	ReDim $aListButton[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
 	Local $maxButtonID = GUICtrlRead($iRow) * GUICtrlRead($iCol)
 	If $maxButtonID > UBound($aDataButton) Then
@@ -425,19 +440,22 @@ Func __ResizeArray()
 EndFunc   ;==>__ResizeArray
 ;~ https://www.autoitscript.com/forum/topic/135203-call-another-script/?do=findComment&comment=943199
 Func __RunAU3($sFilePath, $sWorkingDir = "", $iShowFlag = @SW_SHOW, $iOptFlag = 0)
+	__Log("__RunAU3(" & $sFilePath & ", " & $sWorkingDir & ", " & $iShowFlag & ", " & $iOptFlag & ")")
 	Return Run('"' & @AutoItExe & '" /AutoIt3ExecuteScript "' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
 EndFunc   ;==>__RunAU3
 Func __SaveButtons()
+	__Log("__SaveButtons")
 	_FileWriteFromArray($sPathButtons, $aDataButton)
 	__RefreshButtons()
 EndFunc   ;==>__SaveButtons
 Func __SaveIni()
-	__Log("SaveIni")
+	__Log("__SaveIni")
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "iCol", GUICtrlRead($iCol))
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "iRow", GUICtrlRead($iRow))
 	IniWrite($sPathIni, "AutoIt_Launcher_Global_Settings", "cbLog", GUICtrlRead($cbLog))
 EndFunc   ;==>__SaveIni
 Func __SetEnableButtonSettings($lbRun = $GUI_DISABLE, $lbShell = $GUI_DISABLE, $lbScript = $GUI_DISABLE)
+	__Log("__SetEnableButtonSettings(" & $lbRun & "," & $lbShell & "," & $lbScript & ")")
 ;~ 	Run
 	GUICtrlSetState($iRunProgram, $lbRun)
 	GUICtrlSetState($iRunWorkingdir, $lbRun)
@@ -450,16 +468,20 @@ Func __SetEnableButtonSettings($lbRun = $GUI_DISABLE, $lbShell = $GUI_DISABLE, $
 	GUICtrlSetState($bScriptPath, $lbScript)
 EndFunc   ;==>__SetEnableButtonSettings
 Func __Show()
+	__Log("__Show")
 	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fAutoItLauncher)
 EndFunc   ;==>__Show
 Func __ShowGlobalSettings()
+	__Log("__ShowGlobalSettings")
 	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fGlobalSettings)
 EndFunc   ;==>__ShowGlobalSettings
 
 Func bClick()
+	__Log("bClick")
 	__BtnClick(@GUI_CtrlId)
 EndFunc   ;==>bClick
 Func bIconClick()
+	__Log("bIconClick")
 	Local $sFileOpenDialog = FileOpenDialog("Open File", @ScriptDir & "\icons\", "Images (*.png;*.jpg;*.ico;*.bmp)", $FD_FILEMUSTEXIST)
 	If @error Then
 		FileChangeDir(@ScriptDir)
@@ -469,6 +491,7 @@ Func bIconClick()
 	EndIf
 EndFunc   ;==>bIconClick
 Func bSaveButtonClick()
+	__Log("bSaveButtonClick")
 	$bEdit = False
 	$aDataButton[$iButtonIDEdit][$CST_HINT] = GUICtrlRead($iButtonHint)
 	$aDataButton[$iButtonIDEdit][$CST_ICON] = GUICtrlRead($iButtonIcon)
@@ -492,6 +515,7 @@ Func bSaveButtonClick()
 	__RefreshButtons()
 EndFunc   ;==>bSaveButtonClick
 Func bSaveSettingsClick()
+	__Log("bSaveSettingsClick")
 	$bEdit = False
 	__SaveIni()
 	GUISetState(@SW_HIDE, $fGlobalSettings)
@@ -499,6 +523,7 @@ Func bSaveSettingsClick()
 	__LoadButtons()
 EndFunc   ;==>bSaveSettingsClick
 Func bScriptPathClick()
+	__Log("bScriptPathClick")
 	Local $sFileOpenDialog = FileOpenDialog("Open File", @ScriptDir & "\scripts\", "AutoIt (*.a3x;*.au3)", $FD_FILEMUSTEXIST)
 	If @error Then
 		FileChangeDir(@ScriptDir)
@@ -508,14 +533,17 @@ Func bScriptPathClick()
 	EndIf
 EndFunc   ;==>bScriptPathClick
 Func fAutoItLauncherClose()
+	__Log("fAutoItLauncherClose")
 	GUISetState(@SW_HIDE, $fAutoItLauncher)
 EndFunc   ;==>fAutoItLauncherClose
 ;~ https://www.autoitscript.com/forum/topic/74079-check-for-right-click/?do=findComment&comment=1277537
 Func fAutoItLauncherSecondaryUp()
+	__Log("fAutoItLauncherSecondaryUp")
 	Local $cInfo = GUIGetCursorInfo($fAutoItLauncher)
 	__BtnClick($cInfo[4], False)
 EndFunc   ;==>fAutoItLauncherSecondaryUp
 Func fGlobalSettingsClose()
+	__Log("fGlobalSettingsClose")
 	If $bEdit Then
 		If MsgBox($MB_YESNO, "Save", "Save changes?") = $IDYES Then
 			bSaveSettingsClick()
@@ -527,6 +555,7 @@ Func fGlobalSettingsClose()
 	__Show()
 EndFunc   ;==>fGlobalSettingsClose
 Func fButtonSettingsClose()
+	__Log("fButtonSettingsClose")
 	If $bEdit Then
 		If MsgBox($MB_YESNO, "Save", "Save changes?") = $IDYES Then
 			bSaveButtonClick()
@@ -536,6 +565,7 @@ Func fButtonSettingsClose()
 	__Show()
 EndFunc   ;==>fButtonSettingsClose
 Func rClick()
+	__Log("rClick")
 	If GUICtrlRead($rRun) = $GUI_CHECKED Then
 		__SetEnableButtonSettings($GUI_ENABLE, $GUI_DISABLE, $GUI_DISABLE)
 	ElseIf GUICtrlRead($rShellExecute) = $GUI_CHECKED Then

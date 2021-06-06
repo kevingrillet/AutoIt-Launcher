@@ -27,6 +27,12 @@
 
 Opt("MustDeclareVars", 1) ;0=no, 1=require pre-declaration
 
+Func __ProcessClose($process)
+	While ProcessExists($process)
+		ProcessClose($process)
+	WEnd
+EndFunc   ;==>__ProcessClose
+
 Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 	If Not ProcessExists($process) Then
 		Run($exe, $dir)
@@ -35,4 +41,7 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 EndFunc   ;==>__RunIfNotRunning
 
 __RunIfNotRunning("Bluestacks.exe", "C:\Program Files\BlueStacks\Bluestacks.exe", "C:\Program Files\BlueStacks\", 30)
-ShellExecute("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
+ShellExecuteWait("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
+Sleep(1 * 1000) ; s
+__ProcessClose("adb.exe")
+__ProcessClose("Bluestacks.exe")

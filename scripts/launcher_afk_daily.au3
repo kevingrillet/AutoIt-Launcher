@@ -42,6 +42,5 @@ EndFunc   ;==>__RunIfNotRunning
 
 __RunIfNotRunning("Bluestacks.exe", "C:\Program Files\BlueStacks\Bluestacks.exe", "C:\Program Files\BlueStacks\", 30)
 ShellExecuteWait("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
-Sleep(1 * 1000) ; s
-__ProcessClose("adb.exe")
-__ProcessClose("Bluestacks.exe")
+;__ProcessClose("adb.exe")
+;__ProcessClose("Bluestacks.exe")

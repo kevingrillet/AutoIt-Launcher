@@ -41,6 +41,8 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 EndFunc   ;==>__RunIfNotRunning
 
 __RunIfNotRunning("Bluestacks.exe", "C:\Program Files\BlueStacks\Bluestacks.exe", "C:\Program Files\BlueStacks\", 30)
-ShellExecuteWait("deploy.sh", "-o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
+;~ __RunIfNotRunning("HD-Player.exe", "C:\Program Files\BlueStacks_nxt\HD-Player.exe", "", 60)
+ShellExecuteWait("deploy.sh", "-n -o .history/" & @YEAR & @MON & @MDAY & ".log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
+ShellExecuteWait("deploy.sh", "-n -t -a test -i test -o .history/" & @YEAR & @MON & @MDAY & ".test.log", "D:\Users\kevin\Documents\GitHub\AFK-Daily")
 ;__ProcessClose("adb.exe")
 ;__ProcessClose("Bluestacks.exe")

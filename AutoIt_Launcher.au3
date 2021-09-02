@@ -172,7 +172,7 @@ If Not FileExists($sPathIni) Then
 	__ShowGlobalSettings()
 Else
 	__LoadButtons()
-	__Show()
+;~ 	__Show()
 EndIf
 
 While 1

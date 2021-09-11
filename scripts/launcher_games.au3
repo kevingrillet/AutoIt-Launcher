@@ -40,4 +40,4 @@ __RunIfNotRunning("GalaxyClient.exe", "C:\Program Files (x86)\GOG Galaxy\GalaxyC
 ;~ __RunIfNotRunning("Origin.exe", "D:\Program Files\Origin\Origin.exe")
 __RunIfNotRunning("steam.exe", "C:\Program Files (x86)\Steam\steam.exe")
 ;~ __RunIfNotRunning("upc.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\Uplay.exe")
-__RunIfNotRunning("upc.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\UbisoftConnect.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\\")
+__RunIfNotRunning("upc.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\UbisoftConnect.exe", "C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher")

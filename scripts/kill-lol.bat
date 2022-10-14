@@ -20,4 +20,4 @@ taskkill /F /IM OverwolfHelper.exe
 taskkill /F /IM OverwolfBrowser.exe
 taskkill /F /IM Overwolf.exe
 
-pause
+:: pause

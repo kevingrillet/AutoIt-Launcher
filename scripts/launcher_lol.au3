@@ -34,6 +34,6 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 	EndIf
 EndFunc   ;==>__RunIfNotRunning
 
-;~ __RunIfNotRunning("Blitz.exe", "C:\Users\kevin\AppData\Local\Programs\Blitz\Blitz.exe")
-__RunIfNotRunning("OverwolfLauncher.exe", '"D:\Program Files (x86)\Overwolf\OverwolfLauncher.exe" -launchapp pibhbkkgefgheeglaeemkkfjlhidhcedalapdggh -from-startmenu')
+__RunIfNotRunning("Blitz.exe", "C:\Users\kevin\AppData\Local\Programs\Blitz\Blitz.exe")
+;~ __RunIfNotRunning("OverwolfLauncher.exe", '"D:\Program Files (x86)\Overwolf\OverwolfLauncher.exe" -launchapp pibhbkkgefgheeglaeemkkfjlhidhcedalapdggh -from-startmenu')
 __RunIfNotRunning("LeagueClientUx.exe", "D:\Program Files\Riot Games\League of Legends\LeagueClient.exe")

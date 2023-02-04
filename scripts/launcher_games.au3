@@ -34,6 +34,7 @@ Func __RunIfNotRunning($process, $exe, $dir = "", $time = 0)
 	EndIf
 EndFunc   ;==>__RunIfNotRunning
 
+__RunIfNotRunning("Ankama Launcher.exe", "D:\Program Files\Ankama\Ankama Launcher\Ankama Launcher.exe")
 __RunIfNotRunning("Battle.net.exe", "C:\Program Files (x86)\Battle.net\Battle.net Launcher.exe")
 __RunIfNotRunning("EpicGamesLauncher.exe", "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe")
 __RunIfNotRunning("GalaxyClient.exe", "C:\Program Files (x86)\GOG Galaxy\GalaxyClient.exe")

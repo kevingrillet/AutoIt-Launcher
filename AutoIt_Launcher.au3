@@ -14,7 +14,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_UseUpx=y
 #AutoIt3Wrapper_Res_Description=Small launcher
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
+#AutoIt3Wrapper_Res_Fileversion=1.0.1.0
 #AutoIt3Wrapper_Res_LegalCopyright=Copyright (C) 2021
 #AutoIt3Wrapper_Res_Language=1033
 #AutoIt3Wrapper_Res_Field=Compiler Date|%date%
@@ -60,8 +60,9 @@ Const $CST_SCRIPT = 2
 #EndRegion ### CONSTANTS ###
 
 #Region ### VARIABLES ###
-Dim $aListButton[1][1]
 Dim $aDataButton[1][$CST_SCRIPT_PATH + 1]
+Dim $aListButton[1][1]
+Dim $aListTrayIcon[1][1]
 Local $bEdit = False
 Local $iButtonIDEdit = -1
 Local $sPathButtons = @ScriptDir & "\AutoIt_Launcher_buttons.data"
@@ -155,13 +156,14 @@ GUISetOnEvent($GUI_EVENT_PRIMARYDOWN, "__OnDrag")
 
 
 #Region ### TrayIcon ###
+Local $miShutDown = TrayCreateItem("Shut Down AutoIt Launcher")
+TrayItemSetOnEvent(-1, "__Exit")
+TrayCreateItem("")
 Local $miShow = TrayCreateItem("Show AutoIt Launcher")
 TrayItemSetOnEvent(-1, "__Show")
 Local $miShowSettings = TrayCreateItem("Show Global Settings")
 TrayItemSetOnEvent(-1, "__ShowGlobalSettings")
 TrayCreateItem("")
-Local $miShutDown = TrayCreateItem("Shut Down AutoIt Launcher")
-TrayItemSetOnEvent(-1, "__Exit")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "__Show")
 TraySetToolTip("AutoIt Launcher")
 #EndRegion ### TrayIcon ###
@@ -413,12 +415,29 @@ Func __RefreshButtons()
 			EndIf
 		Next
 	Next
+	For $y = 0 To UBound($aListTrayIcon) - 1 Step 1
+		For $x = 0 To UBound($aListTrayIcon, 2) - 1 Step 1
+			$buttonID = $y * UBound($aListTrayIcon, 2) + $x
+			If $buttonID < UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
+				$aListTrayIcon[$y][$x] = TrayCreateItem($aDataButton[$buttonID][$CST_HINT])
+;~ 				$aListTrayIcon[$y][$x] = TrayCreateItem($aDataButton[$buttonID][$CST_HINT], -1, 0)
+			Else
+				$aListTrayIcon[$y][$x] = TrayCreateItem("Click to edit")
+			EndIf
+			TrayItemSetOnEvent(-1, "tClick")
+		Next
+	Next
 EndFunc   ;==>__RefreshButtons
 Func __RemoveAllButtons()
 	__Log("__RemoveAllButtons")
 	For $y = 0 To UBound($aListButton) - 1 Step 1
 		For $x = 0 To UBound($aListButton, 2) - 1 Step 1
 			GUICtrlDelete($aListButton[$y][$x])
+		Next
+	Next
+	For $y = 0 To UBound($aListTrayIcon) - 1 Step 1
+		For $x = 0 To UBound($aListTrayIcon, 2) - 1 Step 1
+			TrayItemDelete($aListTrayIcon[$y][$x])
 		Next
 	Next
 EndFunc   ;==>__RemoveAllButtons
@@ -433,6 +452,7 @@ EndFunc   ;==>__Resize
 Func __ResizeArray()
 	__Log("__ResizeArray")
 	ReDim $aListButton[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
+	ReDim $aListTrayIcon[GUICtrlRead($iRow)][GUICtrlRead($iCol)]
 	Local $maxButtonID = GUICtrlRead($iRow) * GUICtrlRead($iCol)
 	If $maxButtonID > UBound($aDataButton) Then
 		ReDim $aDataButton[$maxButtonID][$CST_SCRIPT_PATH + 1]
@@ -475,6 +495,30 @@ Func __ShowGlobalSettings()
 	__Log("__ShowGlobalSettings")
 	If Not __GUIVisible() Then GUISetState(@SW_SHOW, $fGlobalSettings)
 EndFunc   ;==>__ShowGlobalSettings
+Func __TrayClick($CtrlId)
+	__Log("__TrayClick")
+	Local $buttonID = 0
+	For $y = 0 To UBound($aListTrayIcon) - 1 Step 1
+		For $x = 0 To UBound($aListTrayIcon, 2) - 1 Step 1
+			If $aListTrayIcon[$y][$x] = $CtrlId Then
+				$buttonID = $y * UBound($aListTrayIcon, 2) + $x
+				If $buttonID <= UBound($aDataButton) And $CST_MODE < UBound($aDataButton, 2) And $aDataButton[$buttonID][$CST_MODE] <> "" Then
+					Switch $aDataButton[$buttonID][$CST_MODE]
+						Case $CST_RUN
+							Run($aDataButton[$buttonID][$CST_RUN_PROGRAM], $aDataButton[$buttonID][$CST_RUN_WORKINGDIR])
+						Case $CST_SHELLEXECUTE
+							ShellExecute($aDataButton[$buttonID][$CST_SHELL_FILENAME], $aDataButton[$buttonID][$CST_SHELL_PARAMETERS], $aDataButton[$buttonID][$CST_SHELL_WORKINGDIR])
+						Case $CST_SCRIPT
+							__RunAU3($aDataButton[$buttonID][$CST_SCRIPT_PATH])
+					EndSwitch
+				Else
+					__LoadButtonSettings($buttonID)
+				EndIf
+				ExitLoop
+			EndIf
+		Next
+	Next
+EndFunc   ;==>__TrayClick
 
 Func bClick()
 	__Log("bClick")
@@ -574,3 +618,7 @@ Func rClick()
 		__SetEnableButtonSettings($GUI_DISABLE, $GUI_DISABLE, $GUI_ENABLE)
 	EndIf
 EndFunc   ;==>rClick
+Func tClick()
+	__Log("tClick")
+	__TrayClick(@TRAY_ID)
+EndFunc   ;==>tClick
